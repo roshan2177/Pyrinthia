@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Eythos — Pyrynthia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#120b18; --ink-2:#1c1226; --panel:#241733; --panel-2:#2e1e3f;
+    --gold:#c9a25c; --gold-bright:#e8c988; --rose:#9c3b4f; --rose-bright:#c85a70;
+    --green:#4f8f6a; --green-bright:#7fd9a4; --blue:#6687d8; --violet:#8c68d8;
+    --parchment:#f1e6cf; --text-soft:#d8cbe8; --text-mute:#a495bd;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: radial-gradient(ellipse at top, #241733 0%, #120b18 60%, #0a060f 100%);
+    min-height:100vh; font-family:'Cormorant Garamond', serif; color:var(--text-soft);
+    display:flex; justify-content:center; padding:0; overflow-x:hidden;
+  }
+  .stars{
+    position:fixed; inset:0; pointer-events:none; z-index:0;
+    background-image:
+      radial-gradient(1px 1px at 20% 30%, rgba(232,201,136,0.6) 50%, transparent 50%),
+      radial-gradient(1px 1px at 70% 60%, rgba(232,201,136,0.5) 50%, transparent 50%),
+      radial-gradient(1.5px 1.5px at 40% 80%, rgba(232,201,136,0.4) 50%, transparent 50%),
+      radial-gradient(1px 1px at 85% 20%, rgba(232,201,136,0.5) 50%, transparent 50%),
+      radial-gradient(1px 1px at 10% 65%, rgba(232,201,136,0.4) 50%, transparent 50%),
+      radial-gradient(1.5px 1.5px at 55% 15%, rgba(232,201,136,0.5) 50%, transparent 50%),
+      radial-gradient(1px 1px at 90% 85%, rgba(232,201,136,0.4) 50%, transparent 50%);
+    background-repeat:no-repeat; opacity:0.8;
+  }
+  .app{ position:relative; z-index:1; width:100%; max-width:520px; min-height:100vh; padding:28px 20px 60px; }
+  .crest{ text-align:center; margin-bottom:8px; }
+  .crest svg{ width:54px; height:54px; }
+  .eyebrow{ text-align:center; font-family:'Cinzel', serif; letter-spacing:0.28em; font-size:11px; color:var(--gold); text-transform:uppercase; margin:6px 0 2px; }
+  h1.title{ font-family:'Cinzel Decorative', serif; text-align:center; font-size:26px; color:var(--gold-bright); margin:6px 0 14px; line-height:1.35; text-shadow:0 0 18px rgba(201,162,92,0.35); }
+  .stats{display:flex; justify-content:center; gap:7px; flex-wrap:wrap; margin:0 0 16px;}
+  .stat-pill{font-family:'Cinzel', serif; font-size:10px; letter-spacing:.08em; border:1px solid rgba(201,162,92,.35); color:var(--text-mute); padding:5px 8px; border-radius:999px; background:rgba(0,0,0,.14);}
+  .card{ background: linear-gradient(180deg, var(--panel) 0%, var(--panel-2) 100%); border:1px solid rgba(201,162,92,0.35); border-radius:6px; padding:26px 22px; position:relative; box-shadow: 0 0 0 1px rgba(0,0,0,0.2), 0 20px 40px rgba(0,0,0,0.4); }
+  .card::before,.card::after{ content:''; position:absolute; width:14px; height:14px; border:1px solid var(--gold); opacity:0.6; }
+  .card::before{ top:8px; left:8px; border-right:none; border-bottom:none; }
+  .card::after{ bottom:8px; right:8px; border-left:none; border-top:none; }
+  .chapter-label{ font-family:'Cinzel', serif; font-size:12px; letter-spacing:0.18em; text-transform:uppercase; color:var(--rose-bright); margin-bottom:10px; text-align:center; }
+  .story-text{
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(20px, 2vw, 24px);
+    line-height: 1.9;
+    font-style:italic;
+
+    color: var(--text-soft);
+
+    max-width: 65ch;
+    margin: 0 auto 24px auto;
+
+    white-space: pre-wrap;
+
+    letter-spacing: 0.02em;
+}
+
+.story-text em{
+    color: var(--gold-bright);
+    font-style: italic;
+}
+
+.story-text strong{
+    color: var(--gold-bright);
+    font-weight: 600;
+}
+  .choices{ display:flex; flex-direction:column; gap:12px; }
+  .choice-btn{ font-family:'Cormorant Garamond', serif; font-size:17px; font-style:italic; background:rgba(201,162,92,0.08); border:1px solid rgba(201,162,92,0.5); color:var(--gold-bright); padding:14px 18px; border-radius:4px; cursor:pointer; text-align:left; transition:all 0.2s ease; -webkit-tap-highlight-color:transparent; }
+  .choice-btn:active{ background:rgba(201,162,92,0.25); transform:scale(0.98); }
+  .continue-btn{ display:block; margin:26px auto 0; font-family:'Cinzel', serif; letter-spacing:0.12em; text-transform:uppercase; font-size:13px; background:var(--rose); border:1px solid var(--rose-bright); color:var(--parchment); padding:13px 30px; border-radius:4px; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+  .continue-btn:active{ transform:scale(0.97); }
+  .hint{ text-align:center; font-size:14px; color:var(--text-mute); font-style:italic; margin-top:6px; }
+  .cust-section{ margin-bottom:22px; }
+  .cust-label{ font-family:'Cinzel', serif; font-size:12px; letter-spacing:0.14em; text-transform:uppercase; color:var(--gold); margin-bottom:10px; }
+  .cust-input{ width:100%; background:rgba(0,0,0,0.25); border:1px solid rgba(201,162,92,0.4); border-radius:4px; color:var(--text-soft); font-family:'Cormorant Garamond', serif; font-size:18px; padding:12px 14px; }
+  .cust-input:focus{ outline:none; border-color:var(--gold-bright); }
+  .cust-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+  .cust-opt{ background:rgba(201,162,92,0.06); border:1px solid rgba(201,162,92,0.4); border-radius:4px; padding:12px 10px; text-align:center; cursor:pointer; font-family:'Cormorant Garamond', serif; font-size:15px; color:var(--text-soft); -webkit-tap-highlight-color:transparent; }
+  .cust-opt.selected{ background:rgba(201,162,92,0.28); border-color:var(--gold-bright); color:var(--gold-bright); }
+  .cust-opt .sub{ display:block; font-size:12px; color:var(--text-mute); margin-top:3px; font-style:italic; }
+  .cust-opt.selected .sub{ color:var(--gold); }
+  .candles{ display:flex; justify-content:center; gap:14px; margin:20px 0; flex-wrap:wrap; }
+  .candle{ width:38px; height:60px; display:flex; flex-direction:column; align-items:center; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+  .flame{ width:10px; height:14px; border-radius:50% 50% 50% 50% / 60% 60% 40% 40%; background:#4a3a2a; margin-bottom:2px; transition:all 0.3s ease; }
+  .flame.lit{ background:radial-gradient(circle, #fff2c4 0%, #f5a623 55%, transparent 80%); box-shadow:0 0 16px 4px rgba(245,166,35,0.7); }
+  .flame.lit.green{ background:radial-gradient(circle, #d9ffe8 0%, #4f8f6a 55%, transparent 80%); box-shadow:0 0 16px 4px rgba(79,143,106,0.7); }
+  .stick{ width:8px; height:40px; background:linear-gradient(180deg, var(--parchment), #cbb98a); border-radius:2px; }
+  .riddle-box{ background:rgba(0,0,0,0.2); border-left:2px solid var(--gold); padding:14px 16px; margin-bottom:18px; font-style:italic; font-size:18px; color:var(--gold-bright); }
+  .riddle-options{ display:flex; flex-direction:column; gap:10px; margin-bottom:12px; }
+  .riddle-opt{ font-family:'Cormorant Garamond', serif; font-size:16px; background:rgba(201,162,92,0.06); border:1px solid rgba(201,162,92,0.4); color:var(--text-soft); padding:12px 16px; border-radius:4px; cursor:pointer; text-align:left; }
+  .riddle-opt.correct{ background:rgba(201,162,92,0.25); border-color:var(--gold-bright); color:var(--gold-bright); }
+  .riddle-opt.wrong{ background:rgba(156,59,79,0.2); border-color:var(--rose); }
+  .riddle-feedback{ text-align:center; font-style:italic; color:var(--text-mute); min-height:20px; margin-bottom:6px; font-size:14px; }
+  .final-seal{ text-align:center; margin:20px 0 10px; }
+  .final-title{ font-family:'Cinzel Decorative', serif; font-size:24px; color:var(--gold-bright); text-align:center; margin:14px 0; text-shadow:0 0 20px rgba(201,162,92,0.4); }
+  .letter{ font-size:19px; line-height:1.8; color:var(--text-soft); margin:18px 0; white-space:pre-wrap; }
+  .signature{ text-align:right; font-family:'Cinzel', serif; font-style:italic; color:var(--gold); font-size:16px; margin-top:10px; }
+  .fade-in{ animation:fadeIn 0.6s ease; }
+  @keyframes fadeIn{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+  .crawl-text{ font-size:19px; line-height:1.9; color:var(--gold-bright); text-align:center; font-style:italic; margin-bottom:22px; white-space:pre-wrap; }
+  .mark-badge{ display:inline-block; width:14px; height:14px; border-radius:50%; border:2px solid var(--green-bright); box-shadow:0 0 8px 2px rgba(127,217,164,0.7); margin-left:6px; vertical-align:middle; }
+  .small-note{font-size:14px;color:var(--text-mute);font-style:italic;text-align:center;margin-top:12px;}
+</style>
+</head>
+<body>
+<div class="stars"></div>
+<div class="app" id="app"></div>
+<script>
+const AUTHOR_SIGN = "— Wherever this story ends, mine begins with you.";
+
+const PRONOUN_SETS = {
+  she: { subj:"she", obj:"her", poss:"her", possPro:"hers", reflex:"herself", be:"is", have:"has", s:"s" },
+  they: { subj:"they", obj:"them", poss:"their", possPro:"theirs", reflex:"themself", be:"are", have:"have", s:"" },
+  he: { subj:"he", obj:"him", poss:"his", possPro:"his", reflex:"himself", be:"is", have:"has", s:"s" }
+};
+
+const state = {
+  screen: "customize",
+  name: "",
+  pronounKey: "she",
+  cls: "",
+  power: "",
+  chapter: "prologue",
+  path: "",
+  trust: 0,
+  boldness: 0,
+  romance: 0,
+  mercy: 0,
+  combat: 0,
+  crown: 0,
+  secrets: 0,
+  inventory: []
+};
+
+function pn(field){ return PRONOUN_SETS[state.pronounKey][field]; }
+function cap(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
+function nm(){ return state.name.trim() || "the marked one"; }
+function classLabel(){ return (CLASSES.find(c=>c.key===state.cls)||{}).label || "Wanderer"; }
+function powerLabel(){ return (POWERS.find(p=>p.key===state.power)||{}).label || "Eythos fire"; }
+function powerLower(){ return powerLabel().toLowerCase(); }
+function has(item){ return state.inventory.includes(item); }
+function addItem(item){ if(!has(item)) state.inventory.push(item); }
+function statLine(){ return `Trust ${state.trust} · Bold ${state.boldness} · Romance ${state.romance} · Mercy ${state.mercy} · Combat ${state.combat}`; }
+
+const CLASSES = [
+  { key:"knight", label:"Knight", sub:"Courage, heavy combat, protection" },
+  { key:"rogue", label:"Rogue", sub:"Sneaking, locks, deception" },
+  { key:"mage", label:"Mage", sub:"Arcane force and spellcraft" },
+  { key:"healer", label:"Healer", sub:"Restoration, mercy, protection" },
+  { key:"ranger", label:"Ranger", sub:"Archery, tracking, survival" },
+  { key:"scholar", label:"Scholar", sub:"Lore, riddles, ancient texts" },
+  { key:"noble", label:"Noble", sub:"Court influence and command" },
+  { key:"witch", label:"Witch", sub:"Rituals, curses, forbidden magic" }
+];
+
+const POWERS = [
+  { key:"lightning", label:"Lightning", sub:"Raw lightning and speed" },
+  { key:"shadow", label:"Shadow", sub:"Darkness, concealment, restraint" },
+  { key:"storm", label:"Storm", sub:"Wind, rain, pressure, thunder" },
+  { key:"dreamwalking", label:"Dreamwalking", sub:"Entering sleeping minds" },
+  { key:"ward", label:"Wards", sub:"Protective barriers and shields" },
+  { key:"retrocognition", label:"Retrocognition", sub:"Reading memories through touch" },
+  { key:"ice", label:"Ice", sub:"Frost, blades, frozen prisons" },
+  { key:"farsight", label:"Farsight", sub:"Glimpsing danger before it arrives" }
+];
+
+function powerLine(kind){
+  const lines = {
+    first:{
+      lightning:`${powerLabel()} leaps between your fingers, bright enough to turn every chain link white.`,
+      shadow:`${powerLabel()} pools beneath your feet, then rises like loyal smoke.`,
+      storm:`The air bows around you as ${powerLower()} gathers in your lungs.`,
+      dreamwalking:`The world thins at the edges as ${powerLower()} opens a door behind your eyes.`,
+      ward:`A translucent shield blooms before you, green fire braided through ${powerLower()}.`,
+      retrocognition:`The moment your palm touches stone, ${powerLower()} drags old memories into the light.`,
+      ice:`Frost flowers across the floor as ${powerLower()} answers your fear.`,
+      farsight:`A future-flash strikes you: one breath, one blade, one chance.`
+    },
+    fight:{
+      lightning:`You drive ${powerLower()} through the beast in a brilliant, branching strike.`,
+      shadow:`You lash the beast in bands of shadow until its own darkness betrays it.`,
+      storm:`You call a violent gale and slam the creature sideways into broken stone.`,
+      dreamwalking:`You slip into the beast's hunger and turn it against itself.`,
+      ward:`You raise a ward, let the monster break itself against it, then shove the barrier forward.`,
+      retrocognition:`You touch the beast's hide and see the wound that made it savage. You strike there.`,
+      ice:`You pin the beast to the earth with spears of ice.`,
+      farsight:`You see the attack before it happens and step into the only angle that can win.`
+    },
+    romance:{
+      lightning:`A tiny spark jumps between your hand and his, and he looks down like the touch hurt in the best possible way.`,
+      shadow:`His shadows reach for yours before either of you moves, tangling like they have missed each other for centuries.`,
+      storm:`The rain refuses to touch you both, curving around the space between your faces.`,
+      dreamwalking:`For half a second, you feel his dream: your name, said like a vow he never meant to confess.`,
+      ward:`A ward wraps around you both, warm and private, shutting out the entire court.`,
+      retrocognition:`When your fingers brush his wrist, you see one memory: him waiting for you long before he knew your name.`,
+      ice:`The window frosts over behind you, turning the room into a hidden winter made just for this moment.`,
+      farsight:`You see the almost-kiss one breath before it happens. The dangerous part is that you don't move away.`
+    }
+  };
+  return (lines[kind] && lines[kind][state.power]) || `Your ${powerLower()} answers you.`;
+}
+
+function classLine(kind){
+  const lines = {
+    challenge:{
+      knight:"Your stance settles before your fear can. Training, instinct, and stubborn courage line up like soldiers.",
+      rogue:"You count exits first, lies second, weapons third. It is always better to know who thinks they have trapped you.",
+      mage:"You taste the spellwork in the air like metal on your tongue.",
+      healer:"You notice the wounds before the weapons — who is bleeding, who is pretending not to be.",
+      ranger:"The forest gives itself away: snapped moss, silent birds, danger moving upwind.",
+      scholar:"The inscription is old, but not unknown. You have read stranger warnings by candlelight.",
+      noble:"You hear the politics beneath the threat. Someone wanted you scared in exactly this room.",
+      witch:"The curse recognizes you. That is either a compliment or a warning. Possibly both."
+    },
+    court:{
+      knight:"The court respects a blade only when it believes the hand holding it will not shake.",
+      rogue:"The court is just a prettier alley: everyone is armed, and everyone is pretending not to be.",
+      mage:"Magic gathers around the nobles like perfume, expensive and meant to intimidate.",
+      healer:"You can feel the room's sickness: fear dressed as tradition.",
+      ranger:"Too many eyes, too few honest paths. You miss trees immediately.",
+      scholar:"Every banner, ring, and bloodline mark is a footnote you wish you had time to read.",
+      noble:"This is familiar warfare: smiles sharpened into knives.",
+      witch:"The old families watch you like people who have forgotten that curses can look back."
+    }
+  };
+  return (lines[kind] && lines[kind][state.cls]) || "You remember what you are.";
+}
+
+const chapters = {
+prologue:{ label:"Prologue", crawl:true, text:()=>`A long time ago, in a kingdom far, far away...\n\nEvery hundred years, a child is born marked by Eythos: a ring of green fire circling the left eye, the sign of a life made from the leftover embers of creation.\n\nThe court calls the marked one tribute. The old books call the marked one a weapon. The Serpent calls the marked one by name.\n\nTonight, that name is ${nm()}.`, next:"wagon" },
+wagon:{ label:"Prologue — The Mark", text:()=>`The wagon wheels haven't stopped grinding since dawn.\n\nYou remember hearing a knock at your door, followed by cold iron at your wrists, and a guard whispering, "Is it ${pn('obj')}? Is ${pn('subj')} really the one?"\n\nWhen you catch your reflection in the water flask at your feet, you understand why he stared. A ring of pale green fire circles your left iris.\n\nThe fae guard across from you swallows. "Eythos," he says. "Gods. ${cap(pn('subj'))} ${pn('be')} really marked."\n\nThe world you knew ends quietly, without asking permission.`, next:"court" },
+court:{ label:"Chapter I — Pyrynthia", text:()=>`The gates of Pyrynthia part in total silence. Inside waits a throne room of candlelight. You see them. The high fae. Thier ethereal faces covered in golden masks with emeralds shaped like whorls of leaves. Some absurd High Fae fashion, no doubt.\n\nA man steps from the shadow of a column. Jagged dark hair. Cruel mouth. A diagonal scar that bisects his left eyebrow and the corner of his mouth. Features so harsh they look carved. At first glance he would be mistaken for a Craven if not for his eyes. Eyes that look like they learned softness and then buried it.\n\n"${nm()}," he snarls, like your name is a curse. "I've been expecting you."\n\nA guard reaches for your chain. The man lifts one hand. The guard stops.\n\n"You're safer here than you think," he says quietly, "and less safe than you'd like. Both are true."\n\n${classLine('court')}`, next:"first_choice" },
+first_choice:{ label:"Chapter I — The First Choice", text:()=>`The court waits for you to break first. He stares at you. His gaze piercing through your soul. His general seated to his right smiles. Red-brown hair, silver lifeless eyes. The general takes delight in your pain, waiting for you to choose who you are going to be in front of them.`, choices:[
+  {text:"Stay silent. Watch them, understand them, choose to belive this is the only way.", next:"silent_path", effect:{path:"trust",trust:1}},
+  {text:"Demand the truth in front of everyone, command thier attention with your voice. Win thier trust as you look for a moment to strike. ", next:"bold_path", effect:{path:"bold",boldness:1}},
+  {text:"Look past him and address the court yourself.", next:"court_command", effect:{crown:1,boldness:1}}
+]},
+silent_path:{ label:"Chapter I — A Quiet Blade", text:()=>`You say nothing. You watch.\n\nHis jaw tightens, almost imperceptibly, as if your silence unsettles him more than anger would have.\n\n"Wise," he murmurs. "Or dangerous. I haven't decided which."\n\nThe smallest smile touches his mouth. It should not make your pulse move. It does anyway.`, next:"culling" },
+bold_path:{ label:"Chapter I — Teeth Bared", text:()=>`"How long have you known what I was?" you ask.\n\nThe hall goes so quiet the candles sound loud.\n\nHe doesn't flinch. "Since before your mother knew."\n\nThat should make you hate him. Maybe it does. But his voice cracks on the last word, and that ruins the clean shape of your anger.`, next:"culling" },
+court_command:{ label:"Chapter I — A Crownless Command", text:()=>`You ignore him and face the court.\n\n"If I am so important," you say, "then stop speaking around me and start speaking to me."\n\nA few nobles inhale. He looks at you like you have just done something reckless enough to be beautiful.\n\n"Careful," he says softly. "Pyrynthia has a weakness for people who sound like rulers."`, next:"culling" },
+culling:{ label:"Chapter II — The Culling Ceremony", text:()=>`The Culling hall is circular, ancient, and lined with five unlit braziers.\n\n"Every marked one before you either lit the flames," he says, "or was carried out afterward. I can't do this part for you."\n\nYour left eye burns green. Your ${powerLower()} stirs for the first time.`, minigame:"culling" },
+culling_result:{ label:"Chapter II — Ascension", text:()=>`The final brazier catches. Green fire answers green fire.\n\n${powerLine('first')}\n\nThe court recoils. He does not.\n\n"There you are," he whispers.\n\nIt feels too intimate for a room full of witnesses.`, next:"road_ambush" },
+road_ambush:{ label:"Chapter III — The Road Teeth", text:()=>`You leave for the Wildwood before dawn. Mist clings to the horses. He rides beside you, close enough that your knees almost touch, far enough that the distance feels deliberate.\n\nThen the road opens its mouth.\n\nCreatures made of bark, bone, and old hunger rise from the ditch. Their antlers scrape sparks from the trees.\n\n${classLine('challenge')}`, choices:[
+  {text:()=>`Use ${powerLower()} before fear can stop you.`, next:"ambush_power", effect:{combat:1,boldness:1}},
+  {text:"Protect him when one creature breaks through.", next:"ambush_protect", effect:{romance:1,trust:1,combat:1}},
+  {text:"Spare the wounded creature and look for what drove it mad.", next:"ambush_mercy", effect:{mercy:1,secrets:1}}
+]},
+ambush_power:{ label:"Chapter III — Power Unleashed", text:()=>`${powerLine('fight')}\n\nFor one glorious second, the entire Wildwood lights around you.\n\nHe stares like he forgot the battle.\n\n"Remind me," he says, breathless, "never to make you angry on purpose."`, next:"balcony" },
+ambush_protect:{ label:"Chapter III — The Shield Between", text:()=>`One of the creatures gets past his shadows. You move before thinking.\n\nYour power erupts between him and death.\n\nHe catches your wrist after, not to stop you — to make sure you are real.\n\n"You protected me," he says.\n\n"Don't sound so surprised."\n\n"I'm not." His thumb brushes once over your pulse. "I'm trying not to sound ruined by it."`, next:"balcony" },
+ambush_mercy:{ label:"Chapter III — The Merciful Cut", text:()=>`You see it before the others do: not evil. Pain. A curse knotted behind the creature's eyes.\n\nYou lower your weapon. He moves like he might drag you back, then stops himself. Trusting you costs him something.\n\nWhen the curse breaks, the creature collapses into harmless moss and bone. Inside its ribs is a black scale.\n\n"Serpent-touched," he says. "Someone is waking it early."\n\nYou pocket the scale.`, onEnter:()=>addItem("Black Scale"), next:"balcony" },
+balcony:{ label:"Chapter IV — The Balcony Scene", text:()=>`That night, the court celebrates your survival as if it had not quietly expected your death.\n\nYou find him on a balcony above the gardens, one hand braced on stone, shadows curled around his injured shoulder.\n\n"You should be inside," he says.\n\n"So should you."\n\nFor once, he has no answer. The moon paints his face silver and makes him look less like a prince, more like a person who has been alone too long.\n\n${powerLine('romance')}`, choices:[
+  {text:"Tend his wound yourself.", next:"tend_wound", effect:{romance:2,trust:1}},
+  {text:"Ask why he really delayed your Culling.", next:"ask_delay", effect:{secrets:1,trust:1}},
+  {text:"Tell him not to look at you like that unless he means it.", next:"almost_kiss", effect:{romance:2,boldness:1}}
+]},
+tend_wound:{ label:"Chapter IV — Close Enough", text:()=>`You clean the blood from his shoulder. He goes very still beneath your hands.\n\n"Does it hurt?"\n\n"Yes."\n\n"Good."\n\nHe laughs once, low and surprised. Then his expression changes when your fingers brush bare skin.\n\n"${nm()}," he says, warning and prayer at once.\n\nYou do not move away immediately. Neither does he.`, next:"wildwood_ruins" },
+ask_delay:{ label:"Chapter IV — Seven Borrowed Years", text:()=>`"Why did you delay it?" you ask. "The truth."\n\nHe looks out over the gardens. "Because you were a child. Because the court would have called it duty. Because I looked at the law and hated it for the first time."\n\n"And me?"\n\nHis eyes return to yours. "I didn't know you yet. That somehow made it worse."`, next:"wildwood_ruins" },
+almost_kiss:{ label:"Chapter IV — Almost", text:()=>`"Do not look at me like that unless you mean it," you say.\n\nHis gaze drops to your mouth.\n\n"I have meant very few things in my life," he says. "Unfortunately, this is one of them."\n\nThe space between you disappears by inches. Then a horn screams from the Wildwood, and duty tears the moment open.\n\nHe closes his eyes, furious. "I am going to kill whoever interrupted that."`, next:"wildwood_ruins" },
+wildwood_ruins:{ label:"Chapter V — The Wildwood Trial", text:()=>`The ruins wait beneath trees so old they seem to remember the first language.\n\nAt the center stands a door of white stone. It opens only for a marked one who understands what kind of strength ${pn('subj')} carr${pn('s')}.`, minigame:"trial_riddle" },
+trial_passed:{ label:"Chapter V — What the Ruin Shows", text:()=>`The door opens into a memory.\n\nYou see the first marked one standing before the Serpent. Not kneeling. Not begging. Fighting.\n\nHe sees it too. The horror on his face is not fear of the Serpent. It is understanding.\n\n"They lied," he says. "The Culling was never a sacrifice. It was training."`, next:"shelter" },
+shelter:{ label:"Chapter V — One Bed, One Storm", text:()=>`The storm hits before you can return to court. You take shelter in an abandoned watchtower with one narrow bed, one dying fire, and far too much silence.\n\nRain hammers the roof. His coat ends up around your shoulders. Neither of you mentions it.\n\n"Sleep," he says. "I'll keep watch."\n\n"You look like you're about to fall over."\n\n"Flattery. Dangerous tactic."`, choices:[
+  {text:"Make him rest beside you. Nothing happens. Everything happens.", next:"bed_scene", effect:{romance:2,trust:1}},
+  {text:"Ask what he would choose if duty did not exist.", next:"duty_scene", effect:{romance:1,secrets:1}},
+  {text:"Keep watch yourself and let him sleep for once.", next:"watch_scene", effect:{trust:2,mercy:1}}
+]},
+bed_scene:{ label:"Chapter V — The Space Between", text:()=>`He lies down like the bed is a battlefield.\n\nAt first, neither of you touches. Then thunder cracks, the room shudders, and his hand finds yours in the dark.\n\n"I can let go," he says.\n\nYou don't answer. You only close your fingers around his.\n\nIn the morning, he wakes first and pretends not to be smiling.`, next:"archive" },
+duty_scene:{ label:"Chapter V — Without Duty", text:()=>`"What would you choose," you ask, "if duty did not exist?"\n\nHe looks at you for a long time.\n\n"A cottage where no one knows my name," he says. "A door that locks. A garden. Someone impossible beside me, complaining that I planted the wrong flowers."\n\n"That sounds suspiciously specific."\n\n"I have a vivid imagination."\n\n"Coward."\n\n"Only about this."`, next:"archive" },
+watch_scene:{ label:"Chapter V — The Guarded Heart", text:()=>`You take the watch and let him sleep.\n\nIn rest, his face loses its armor. He looks younger. Lonelier. When he murmurs your name, you almost pretend you didn't hear it.\n\nAlmost.`, next:"archive" },
+archive:{ label:"Chapter VI — The Archive of Eythos", text:()=>`The Archive door is older than the court itself. Its surface is covered in names of marked ones who were called tribute and treated as weapons.\n\nThe black scale in your pocket warms. The Serpent is closer than anyone wants to admit.`, minigame:"archive_riddle" },
+archive_open:{ label:"Chapter VI — The Truth Under the Treaty", text:()=>`The Archive opens.\n\nInside, the records do not say surrender. They say bond. They say power. They say the marked one and the shadow prince were always meant to fight together.\n\nHe reads over your shoulder, close enough that his breath moves your hair.\n\n"I thought I was saving you from the treaty," he says. "I may have been keeping you from the only thing that could save us."\n\nA scream echoes from the court above.`, next:"assassin" },
+assassin:{ label:"Chapter VII — Knives at Court", text:()=>`The assassin wears a noble's face and a serpent's smile.\n\nBlades flash in the candlelight. The court scatters. He reaches for you at the same moment you reach for your power.`, choices:[
+  {text:()=>`Blast the assassin with ${powerLower()}.`, next:"assassin_power", effect:{combat:2,boldness:1}},
+  {text:"Capture them alive for answers.", next:"assassin_capture", effect:{mercy:1,secrets:2}},
+  {text:"Let him fight while you protect the innocent.", next:"assassin_protect", effect:{trust:1,mercy:1,romance:1}}
+]},
+assassin_power:{ label:"Chapter VII — No More Running", text:()=>`${powerLine('fight')}\n\nThe assassin crashes through a banquet table. Silence follows.\n\nHe steps beside you, eyes bright. "Remind me again why anyone thought kidnapping you was the safe option?"`, next:"training" },
+assassin_capture:{ label:"Chapter VII — A Living Answer", text:()=>`You stop the killing blow.\n\n"Alive," you say.\n\nHe obeys instantly. The assassin spits blood and laughs. "The Serpent already has a door. You opened it when you lit the braziers."\n\nThe court erupts. He only looks at you. "Then we close it together."`, next:"training" },
+assassin_protect:{ label:"Chapter VII — The People Below the Crown", text:()=>`You throw your power around the servants and frightened pages first.\n\nHe sees. Of course he sees.\n\nWhen the assassin falls, he does not look at the blood. He looks at the people alive because of you.\n\n"That," he says softly, "is why crowns should be afraid of you."`, next:"training" },
+training:{ label:"Chapter VII — Training Duel", text:()=>`At midnight, he takes you to the old sparring hall.\n\n"The Serpent will not be impressed by potential," he says. "Show me what you can do."\n\nHe attacks without warning. Shadows become blades. Your mark flares.`, choices:[
+  {text:"Fight seriously. Make him yield.", next:"duel_win", effect:{combat:2,boldness:1}},
+  {text:"Turn the duel into a dance.", next:"duel_dance", effect:{romance:2,trust:1}},
+  {text:"Use your class training instead of raw power.", next:"duel_class", effect:{combat:1,secrets:1}}
+]},
+duel_win:{ label:"Chapter VII — Yield", text:()=>`You catch him at the throat with your power.\n\nHe freezes. Then smiles like defeat has never looked so tempting.\n\n"Yield," you say.\n\n"To you?" His voice lowers. "Repeatedly."`, next:"confession" },
+duel_dance:{ label:"Chapter VII — The Dance Disguised as War", text:()=>`The duel becomes rhythm: blade, breath, turn, almost-touch.\n\nHe catches your waist to keep you from slipping. You could step away. You don't.\n\n"This is not training," you whisper.\n\n"No," he says. "It is much more dangerous."`, next:"confession" },
+duel_class:{ label:"Chapter VII — What You Are", text:()=>`${classLine('challenge')}\n\nYou do not beat him with strength. You beat him with the part of yourself the court underestimated.\n\nHe lowers his blade. "There ${pn('subj')} ${pn('be')}," he says, almost reverent. "Not the mark. Not the treaty. You."`, next:"confession" },
+confession:{ label:"Chapter VIII — Before the War", text:()=>`The night before the Serpent arrives, he finds you beneath the green-flamed braziers.\n\n"I need to say something before tomorrow makes cowards of us both," he says.\n\nFor once, the shadows do not hide him.\n\n"I was supposed to guard the marked one. Then I met ${nm()}. That was the first mistake. The second was thinking I could survive caring about ${pn('obj')}."`, choices:[
+  {text:"Kiss him.", next:"kiss", effect:{romance:3,trust:1}},
+  {text:"Tell him you choose him, but not instead of yourself.", next:"choose_self", effect:{romance:2,crown:1}},
+  {text:"Tell him to survive first. Confess after.", next:"survive_first", effect:{trust:2,combat:1}}
+]},
+kiss:{ label:"Chapter VIII — The Kiss", text:()=>`You kiss him before the world can interrupt again.\n\nFor a heartbeat, he is completely still. Then one hand cups your face like you are something holy and impossible.\n\nThe green fire around your eye flares. His shadows answer.\n\nSomewhere deep beneath the world, the Serpent wakes screaming.`, next:"invasion1" },
+choose_self:{ label:"Chapter VIII — Not Instead", text:()=>`"I choose you," you say. "But not instead of myself."\n\nHis expression breaks into something dangerously close to devotion.\n\n"Good," he says. "I would not know what to do with a love that made you smaller."`, next:"invasion1" },
+survive_first:{ label:"Chapter VIII — After", text:()=>`"Survive tomorrow," you say. "Then say it again."\n\nHe bows his head, smiling despite the fear in his eyes.\n\n"Cruel," he murmurs. "Giving me a reason."`, next:"invasion1" },
+invasion1:{ label:"Chapter IX — The Serpent Wakes", text:()=>`The Serpent does not arrive. The world becomes aware it was always underneath you.\n\nStone splits. Towers bend. The sky turns the color of old bruises.\n\nHe stands at your side. "Whatever happens, stay with me."\n\nThe mark around your eye burns like a star.`, choices:[
+  {text:()=>`Open with ${powerLower()} and break its first attack.`, next:"battle_power", effect:{combat:2}},
+  {text:"Coordinate with his shadows and fight as one.", next:"battle_bond", effect:{romance:1,trust:2,combat:1}},
+  {text:"Search for the human heart of the curse.", next:"battle_mercy", effect:{mercy:2,secrets:1}}
+]},
+battle_power:{ label:"Chapter IX — Green Fire", text:()=>`${powerLine('fight')}\n\nThe Serpent recoils. For the first time in a hundred years, it learns pain.\n\nBut pain makes it clever. It turns toward the court, toward the people who cannot survive what you can.`, next:"invasion2" },
+battle_bond:{ label:"Chapter IX — Shadow and Signet", text:()=>`His shadows lift you as your power strikes through them. You move together like the Archive was right — like the story had been waiting centuries for the two of you to remember it.\n\nThe Serpent screams. He laughs once, wild and bright.\n\n"Again," he says.\n\nYou do.`, next:"invasion2" },
+battle_mercy:{ label:"Chapter IX — The Wound Inside", text:()=>`You look past the scales, past the rage, and see the curse rooted in an ancient wound.\n\n"It was made," you realize. "Someone made it this hungry."\n\nHe turns, horrified. "Can you unmake it?"\n\nYou do not know. That has never stopped you before.`, next:"invasion2" },
+invasion2:{ label:"Chapter IX — The Second Phase", text:()=>`The Serpent changes shape. Wings of bone. A crown of teeth. A voice like mountains breaking.\n\nIt offers you a bargain: leave Pyrynthia, leave him, and it will give you a life untouched by duty.`, choices:[
+  {text:"Refuse. No bargain that requires abandoning him is freedom.", next:"final_choice", effect:{romance:1,trust:1}},
+  {text:"Refuse. Pyrynthia will answer to you, not to monsters.", next:"final_choice", effect:{crown:2,boldness:1}},
+  {text:"Accept nothing, but listen for the lie hidden inside the offer.", next:"final_choice", effect:{secrets:2,mercy:1}}
+]},
+final_choice:{ label:"Chapter X — The Final Choice", text:()=>`The Serpent falls still — not dead, not yet, but wounded enough to understand fear.\n\nPyrynthia watches. He watches. The mark around your eye waits.\n\nThis is the moment every old story tried to steal from you.\n\nSo you choose for yourself.`, choices:[
+  {text:"Choose love: bind your power to his and end this together.", next:"ending_bond"},
+  {text:"Choose the crown: take command of Pyrynthia and rewrite the treaty.", next:"ending_crown"},
+  {text:"Choose mercy: break the curse, even if it costs you the easy ending.", next:"ending_mercy"},
+  {text:"Choose legend: destroy the Serpent with everything you are.", next:"ending_legend"}
+]},
+ending_bond:{ label:"Epilogue — Bond", final:true, ending:"bond" },
+ending_crown:{ label:"Epilogue — Crown", final:true, ending:"crown" },
+ending_mercy:{ label:"Epilogue — Mercy", final:true, ending:"mercy" },
+ending_legend:{ label:"Epilogue — Legend", final:true, ending:"legend" }
+};
+
+function resolveText(ch){ return typeof ch.text === "function" ? ch.text() : (ch.text || ""); }
+function resolveChoices(ch){ return typeof ch.choices === "function" ? ch.choices() : ch.choices; }
+function applyEffect(effect){
+  if(!effect) return;
+  for(const [k,v] of Object.entries(effect)){
+    if(k === "path") state.path = v;
+    else if(typeof state[k] === "number") state[k] += v;
+  }
+}
+
+function go(next){
+  const ch = chapters[next];
+  state.chapter = next;
+  if(ch && typeof ch.onEnter === "function") ch.onEnter();
+  render();
+}
+
+function render(){
+  const app = document.getElementById('app');
+  app.innerHTML = '';
+  if(state.screen === "customize"){ renderCustomize(app); return; }
+
+  const ch = chapters[state.chapter];
+  const crest = document.createElement('div');
+  crest.className = 'crest';
+  crest.innerHTML = `<svg viewBox="0 0 100 100" fill="none"><path d="M50 6 L58 40 L92 40 L64 60 L74 94 L50 72 L26 94 L36 60 L8 40 L42 40 Z" stroke="#c9a25c" stroke-width="2" fill="rgba(201,162,92,0.08)"/></svg>`;
+  app.appendChild(crest);
+  const eyebrow = document.createElement('div'); eyebrow.className = 'eyebrow'; eyebrow.textContent = 'Eythos'; app.appendChild(eyebrow);
+  const h1 = document.createElement('h1'); h1.className = 'title'; h1.innerHTML = nm() + '<span class="mark-badge"></span>'; app.appendChild(h1);
+  const stats = document.createElement('div'); stats.className='stats';
+  [classLabel(), powerLabel(), statLine()].forEach(t=>{ const s=document.createElement('span'); s.className='stat-pill'; s.textContent=t; stats.appendChild(s); });
+  app.appendChild(stats);
+  const card = document.createElement('div'); card.className = 'card fade-in';
+  const label = document.createElement('div'); label.className = 'chapter-label'; label.textContent = ch.label; card.appendChild(label);
+  const textVal = resolveText(ch);
+  if(textVal){ const text=document.createElement('div'); text.className=ch.crawl?'crawl-text':'story-text'; text.textContent=textVal; card.appendChild(text); }
+  app.appendChild(card);
+
+  if(ch.minigame === 'culling') renderCulling(card);
+  else if(ch.minigame === 'trial_riddle') renderTrialRiddle(card);
+  else if(ch.minigame === 'archive_riddle') renderArchiveRiddle(card);
+  else if(ch.final) renderFinal(card, ch);
+  else if(ch.choices) renderChoices(card, resolveChoices(ch));
+  else if(ch.next){ const btn=document.createElement('button'); btn.className='continue-btn'; btn.textContent='Continue'; btn.onclick=()=>go(ch.next); card.appendChild(btn); }
+}
+
+function renderChoices(card, choices){
+  const wrap = document.createElement('div'); wrap.className = 'choices';
+  choices.forEach(c=>{ const btn=document.createElement('button'); btn.className='choice-btn'; btn.textContent=typeof c.text==='function'?c.text():c.text; btn.onclick=()=>{ applyEffect(c.effect); go(c.next); }; wrap.appendChild(btn); });
+  card.appendChild(wrap);
+}
+
+function renderCustomize(app){
+  const crest=document.createElement('div'); crest.className='crest'; crest.innerHTML=`<svg viewBox="0 0 100 100" fill="none"><path d="M50 6 L58 40 L92 40 L64 60 L74 94 L50 72 L26 94 L36 60 L8 40 L42 40 Z" stroke="#c9a25c" stroke-width="2" fill="rgba(201,162,92,0.08)"/></svg>`; app.appendChild(crest);
+  const eyebrow=document.createElement('div'); eyebrow.className='eyebrow'; eyebrow.textContent='Before the mark'; app.appendChild(eyebrow);
+  const h1=document.createElement('h1'); h1.className='title'; h1.textContent='Who are you?'; app.appendChild(h1);
+  const card=document.createElement('div'); card.className='card fade-in';
+  const nameSection=document.createElement('div'); nameSection.className='cust-section'; nameSection.innerHTML=`<div class="cust-label">Name</div>`;
+  const nameInput=document.createElement('input'); nameInput.className='cust-input'; nameInput.placeholder='Enter any name'; nameInput.value=state.name; nameInput.oninput=e=>state.name=e.target.value; nameSection.appendChild(nameInput); card.appendChild(nameSection);
+  addOptionGrid(card,'Pronouns',[['she','She / her'],['they','They / them'],['he','He / him']], 'pronounKey', true);
+  addOptionGrid(card,'Class',CLASSES.map(c=>[c.key,c.label,c.sub]), 'cls');
+  addOptionGrid(card,'Power / Signet',POWERS.map(p=>[p.key,p.label,p.sub]), 'power');
+  const startBtn=document.createElement('button'); startBtn.className='continue-btn'; startBtn.textContent='Begin'; startBtn.onclick=()=>{ if(!state.name.trim()){ nameInput.style.borderColor='var(--rose-bright)'; return; } if(!state.cls || !state.power){ alert('Choose a class and a power before you begin.'); return; } state.screen='story'; render(); }; card.appendChild(startBtn);
+  const note=document.createElement('div'); note.className='small-note'; note.textContent='Name, pronouns, class, and power will all be used inside the story.'; card.appendChild(note);
+  app.appendChild(card);
+}
+function addOptionGrid(card,label,items,stateKey,threeCols=false){
+  const section=document.createElement('div'); section.className='cust-section'; section.innerHTML=`<div class="cust-label">${label}</div>`;
+  const grid=document.createElement('div'); grid.className='cust-grid'; if(threeCols) grid.style.gridTemplateColumns='repeat(3,1fr)';
+  items.forEach(([key,lab,sub])=>{ const opt=document.createElement('div'); opt.className='cust-opt'+(state[stateKey]===key?' selected':''); opt.innerHTML=lab+(sub?`<span class="sub">${sub}</span>`:''); opt.onclick=()=>{ state[stateKey]=key; render(); }; grid.appendChild(opt); });
+  section.appendChild(grid); card.appendChild(section);
+}
+
+function renderCulling(card){
+  const truths=["The first flame remembers your name.","The second flame recognizes your power.","The third flame shows a Serpent beneath the world.","The fourth flame shows his hand reaching for yours.","The fifth flame does not ask if you are ready. It crowns you anyway."];
+  const wrap=document.createElement('div'); wrap.className='candles'; let lit=0;
+  for(let i=0;i<5;i++){ const c=document.createElement('div'); c.className='candle'; const flame=document.createElement('div'); flame.className='flame'; const stick=document.createElement('div'); stick.className='stick'; c.appendChild(flame); c.appendChild(stick); c.onclick=()=>{ if(flame.classList.contains('lit')) return; flame.classList.add('lit','green'); lit++; showHint(truths[i]); if(lit===5) setTimeout(()=>go('culling_result'),1200); }; wrap.appendChild(c); }
+  card.appendChild(wrap); const hint=document.createElement('div'); hint.className='hint'; hint.id='culling-hint'; hint.textContent='Touch each brazier to light it.'; card.appendChild(hint);
+}
+function showHint(t){ const hint=document.getElementById('culling-hint'); if(hint) hint.textContent=t; }
+
+function renderTrialRiddle(card){
+  const correctMap={knight:'Resolve',rogue:'Patience',mage:'Focus',healer:'Time',ranger:'Instinct',scholar:'Knowledge',noble:'Presence',witch:'A curse'};
+  const promptMap={knight:'What wins more fights before they start than any blade ever has?',rogue:'What opens every door but fits no lock?',mage:'What burns brightest with the least fuel?',healer:'What heals the deepest wound money never can?',ranger:'What leaves no track but is never lost?',scholar:"What grows more valuable the more it's given away?",noble:'What commands a room without ever raising its voice?',witch:'What costs the caster more than the target?'};
+  const correct=correctMap[state.cls]||'Resolve';
+  riddle(card, promptMap[state.cls]||'What wins more than strength ever could?', correct, ['Gold','Fear','Speed','Silence'], 'The ruin accepts you.', 'trial_passed');
+}
+function renderArchiveRiddle(card){ riddle(card, 'I am not given, though I am often asked for. I grow only when spent, and vanish the moment you demand proof of me. What am I?', 'Trust', ['Gold','Time','Loyalty'], 'The Archive opens.', 'archive_open'); }
+function riddle(card,prompt,correct,distractors,success,next){
+  const box=document.createElement('div'); box.className='riddle-box'; box.textContent='The riddle asks: “'+prompt+'”'; card.appendChild(box);
+  const feedback=document.createElement('div'); feedback.className='riddle-feedback';
+  const options=[correct,...distractors.filter(x=>x!==correct).slice(0,3)].sort(()=>Math.random()-0.5);
+  const wrap=document.createElement('div'); wrap.className='riddle-options';
+  options.forEach(opt=>{ const btn=document.createElement('button'); btn.className='riddle-opt'; btn.textContent=opt; btn.onclick=()=>{ if(opt===correct){ btn.classList.add('correct'); feedback.textContent=success; Array.from(wrap.children).forEach(b=>b.onclick=null); setTimeout(()=>go(next),1100); } else { btn.classList.add('wrong'); feedback.textContent='The stone rejects that answer.'; } }; wrap.appendChild(btn); });
+  card.appendChild(wrap); card.appendChild(feedback);
+}
+
+function renderFinal(card,ch){
+  const seal=document.createElement('div'); seal.className='final-seal'; seal.innerHTML=`<svg width="60" height="60" viewBox="0 0 100 100" fill="none"><circle cx="50" cy="50" r="46" stroke="#c9a25c" stroke-width="2" fill="rgba(201,162,92,0.08)"/><path d="M50 20 L58 44 L84 44 L62 58 L70 82 L50 66 L30 82 L38 58 L16 44 L42 44 Z" fill="#e8c988" opacity="0.85"/></svg>`; card.appendChild(seal);
+  const endingText={
+    bond:{title:'Chosen, Together', body:()=>`The Serpent breaks beneath green fire and shadow.\n\nWhen silence returns, he finds you through the smoke and pulls you into him like the world can wait one more second.\n\n"I choose you," he says. "Not because of the mark. Not because of prophecy. Because you are ${nm()}, and somehow that became the only fate I wanted."\n\nPyrynthia kneels. You do not ask it to.\n\nLater, when the court has finally stopped demanding miracles, he presses a kiss to your marked eye and whispers, "My favorite impossible thing."`},
+    crown:{title:'Long Live '+nm(), body:()=>`You do not kneel to the treaty. You rewrite it.\n\nThe Serpent is bound beneath the roots of the world, and Pyrynthia rises around you changed forever.\n\nHe stands at your side, not in front of you.\n\n"Command me," he murmurs, smiling like trouble.\n\n"Careful," you say. "I might."\n\nThe court calls you marked one, ruler, storm-breaker, oath-maker. He only calls you by your name, like that is the holiest title of all.`},
+    mercy:{title:'The Curse Unmade', body:()=>`You see the wound inside the monster and choose not to become another blade in an old cycle.\n\nIt nearly costs you everything.\n\nBut when the curse breaks, the Serpent is not a god or a beast. It is only a tired ancient thing finally allowed to sleep.\n\nHe catches you as you fall.\n\n"Do not ever scare me like that again," he says, voice ruined.\n\n"No promises."\n\nHe laughs into your shoulder, and the world survives around you.`},
+    legend:{title:nm()+' the Serpent-Breaker', body:()=>`You pour everything you are into the final strike: class, power, fear, love, fury, choice.\n\nThe Serpent dies looking at you.\n\nFor one breath, no one moves. Then Pyrynthia erupts.\n\nHe reaches you first. Of course he does.\n\n"There are going to be songs about you," he says.\n\n"Good ones?"\n\n"Terrible ones. I will personally threaten the bards until they improve."\n\nYou laugh, and his face changes like that sound was the ending he had been fighting for.`}
+  };
+  const data=endingText[ch.ending]||endingText.bond;
+  const title=document.createElement('div'); title.className='final-title'; title.textContent=data.title; card.appendChild(title);
+  const letter=document.createElement('div'); letter.className='letter'; letter.textContent=data.body(); card.appendChild(letter);
+  const sig=document.createElement('div'); sig.className='signature'; sig.textContent=AUTHOR_SIGN; card.appendChild(sig);
+  const restart=document.createElement('button'); restart.className='continue-btn'; restart.textContent='Play Again'; restart.onclick=()=>{ location.reload(); }; card.appendChild(restart);
+}
+
+render();
+</script>
+</body>
+</html>
